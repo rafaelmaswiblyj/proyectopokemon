@@ -1,8 +1,19 @@
 const form = document.getElementById("form");
 const input = document.getElementById("input");
 const container = document.getElementById("container");
+const mensaje = document.getElementById("mensaje");
 
 const baseURL = "https://pokeapi.co/api/v2/pokemon/";
+
+const mensajeVisible = () =>{
+    if(pokemonesCargados.length){
+        mensaje.classList.add("hidden");
+        return;
+    } else{
+        mensaje.classList.add("visible");
+        return;
+    }
+}
 
 const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -33,6 +44,7 @@ const requestPokemon = async () => {
         renderizaArray(pokemonesCargados);
         // Guarda el pokemon en el localStorage
         localStorage.setItem(pokemon.name, JSON.stringify(pokemon));
+
         return pokemon;
     } else {
         throw new Error("No se pudo encontrar el pokemon.");
@@ -73,10 +85,11 @@ form.addEventListener("submit", async (e) => {
     }
 });
 
-const renderiza = (pokemon) => {
+const renderiza = (pokemon, id) => {
     const capitalizedPokemonName = capitalizeFirstLetter(pokemon.name);
 
     const cardElement = document.createElement('div');
+    cardElement.setAttribute('data-id', id); // Agrega un identificador único
     cardElement.innerHTML = `
     <div id="card">
         <div>
@@ -85,11 +98,30 @@ const renderiza = (pokemon) => {
             <p>Peso: ${pokemon.weight}</p>
         </div>
         <img src=${pokemon.sprites.front_default} width="200px" height="200px" style="border-radius: 20px;">
+        <button class="eliminar" data-id="${id}">X</button>
     </div>
     `;
 
+    mensajeVisible();
     return cardElement;
 };
 
+
 // Llama a cargarPokemonesDesdeLocalStorage después de definirla
 cargarPokemonesDesdeLocalStorage();
+
+/*
+¡Claro! Aquí están los cambios que hice en el código con explicaciones sencillas:
+
+1. **Lista de Pokémon Cargados**: Antes, el código sobrescribía el Pokémon en el contenedor cada vez que presionabas el botón. Ahora, hemos creado una lista llamada `pokemonesCargados` que almacena todos los Pokémon que se han cargado.
+
+2. **Renderizar Todos los Pokémon**: En lugar de reemplazar el Pokémon existente en el contenedor, ahora utilizamos una función llamada `renderizaArray` que toma la lista de Pokémon cargados y los muestra en el contenedor. Esto asegura que todos los Pokémon cargados se muestren en la página, no solo el último.
+
+3. **Guardar en el LocalStorage**: Después de cargar un nuevo Pokémon, lo guardamos en el `localStorage`, como lo hicimos antes. Esto garantiza que los Pokémon persistan incluso después de recargar la página.
+
+4. **Formulario de Envío**: Cuando envías el formulario, llamamos a `requestPokemon` para cargar el nuevo Pokémon. Luego, reiniciamos el formulario para que puedas ingresar otro número si lo deseas.
+
+5. **Función `renderiza`**: Esta función se encarga de crear el HTML para mostrar un Pokémon en la página. La usamos tanto al cargar los Pokémon desde el `localStorage` como al cargar uno nuevo.
+
+En resumen, estos cambios permiten agregar y mostrar varios Pokémon en la página cada vez que presionas el botón, en lugar de reemplazar el Pokémon existente. Además, los Pokémon cargados se almacenan en el `localStorage` para que persistan después de recargar la página.
+*/
