@@ -58,7 +58,8 @@ const renderiza = (pokemon, id) => {
         <div>
             <h3>${capitalizedPokemonName}</h3>
             <p>Tipo: ${pokemon.types[0].type.name}</p>
-            <p>Peso: ${pokemon.weight / 10} kg.</p>
+            <p>Peso: ${pokemon.weight / 10} kg</p>
+            <p>Altura: ${pokemon.height / 10} m</p>
             <p>Id: ${pokemon.id}</p>
         </div>
         <img src=${pokemon.sprites.front_default} width="150px" height="150px" style="border-radius: 20px;">
