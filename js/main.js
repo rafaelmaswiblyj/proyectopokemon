@@ -5,70 +5,10 @@ const mensaje = document.getElementById("mensaje");
 
 const baseURL = "https://pokeapi.co/api/v2/pokemon/";
 
-const mensajeVisible = () =>{
-    if(pokemonesCargados.length){
-        mensaje.classList.add("hidden");
-        return;
-    } else{
-        mensaje.classList.add("visible");
-        return;
-    }
-}
-
-const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-};
-
 // Inicializa una lista vacía para almacenar los Pokémon
-const pokemonesCargados = [];
+let pokemonesCargados =  JSON.parse(localStorage.getItem('pokemonesCargados')) || [] ;
 
-const renderizaArray = (array) => {
-    // Limpiar el contenedor antes de agregar las tarjetas
-    container.innerHTML = '';
-    array.forEach(card => {
-        const cardElement = renderiza(card);
-        container.appendChild(cardElement);
-    });
-};
-
-const requestPokemon = async () => {
-    const idPokemon = input.value.trim();
-
-    const response = await fetch(baseURL + idPokemon);
-
-    if (response.ok) {
-        const pokemon = await response.json();
-        // Guarda el pokemon en la lista de Pokémon cargados
-        pokemonesCargados.push(pokemon);
-        // Renderiza todos los Pokémon en la lista
-        renderizaArray(pokemonesCargados);
-        // Guarda el pokemon en el localStorage
-        localStorage.setItem(pokemon.name, JSON.stringify(pokemon));
-
-        return pokemon;
-    } else {
-        throw new Error("No se pudo encontrar el pokemon.");
-    }
-};
-
-const cargarPokemonesDesdeLocalStorage = () => {
-    // Obtiene todas las claves almacenadas en el localStorage
-    const keys = Object.keys(localStorage);
-    const pokemones = [];
-
-    // Recorre las claves y recupera los pokemones almacenados
-    keys.forEach(key => {
-        try {
-            const pokemon = JSON.parse(localStorage.getItem(key));
-            pokemones.push(pokemon);
-        } catch (error) {
-            console.error("Error al recuperar un pokemon del localStorage:", error);
-        }
-    });
-
-    // Renderiza los pokemones almacenados
-    renderizaArray(pokemones);
-};
+console.log(pokemonesCargados);
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -85,30 +25,96 @@ form.addEventListener("submit", async (e) => {
     }
 });
 
+const requestPokemon = async () => {
+    const idPokemon = input.value.trim();
+
+    const response = await fetch(baseURL + idPokemon);
+
+    if (response.ok) {
+        const pokemon = await response.json();
+        // Guarda el pokemon en la lista de Pokémon cargados
+        pokemonesCargados.push(pokemon);
+        // Renderiza todos los Pokémon en la lista
+        renderizaArray(pokemonesCargados);
+        // Guarda el pokemon en el localStorage
+        localStorage.setItem(`pokemonesCargados`, JSON.stringify(pokemonesCargados));
+        //Checkeamos el mensaje
+        checkeaMensaje(pokemonesCargados);
+        return pokemon;
+    } else {
+        throw new Error("No se pudo encontrar el pokemon.");
+    }
+};
+
+const renderizaArray = (array) => {
+    container.innerHTML = array.map(card => renderiza(card)).join('');
+};
+
 const renderiza = (pokemon, id) => {
     const capitalizedPokemonName = capitalizeFirstLetter(pokemon.name);
 
-    const cardElement = document.createElement('div');
-    cardElement.setAttribute('data-id', id); // Agrega un identificador único
-    cardElement.innerHTML = `
+    return `
     <div id="card">
         <div>
             <h3>${capitalizedPokemonName}</h3>
             <p>Tipo: ${pokemon.types[0].type.name}</p>
-            <p>Peso: ${pokemon.weight}</p>
+            <p>Peso: ${pokemon.weight / 10} kg.</p>
+            <p>Id: ${pokemon.id}</p>
         </div>
-        <img src=${pokemon.sprites.front_default} width="200px" height="200px" style="border-radius: 20px;">
-        <button class="eliminar" data-id="${id}">X</button>
+        <img src=${pokemon.sprites.front_default} width="150px" height="150px" style="border-radius: 20px;">
+        <button class="close" data-id="${pokemon.id}">X</button>
     </div>
     `;
-
-    mensajeVisible();
-    return cardElement;
 };
 
+const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
-// Llama a cargarPokemonesDesdeLocalStorage después de definirla
-cargarPokemonesDesdeLocalStorage();
+//////
+const removePokemon = e => {
+    // Si lo que estamos clickeando NO CONTIENE la clase close, que no haga nada retorna.
+    if (!e.target.classList.contains('close')) return;
+    //   Si no pasa esto
+    //   Guardamos el data-id (Ese data-id es el id de la ciudad.) de las x en una variable
+    console.log("Hola");
+    const filterId = Number(e.target.dataset.id);
+    //   console.log(`Este es el dataset de la x: ${filterId}`);
+    //  Preguntamos si queremos eliminar con un window.confirm
+    if (window.confirm('¿Estas seguro que queres eleminar este pokemon?')) {
+      // Filtramos el pokemon del array, me saca la card que estoy clickeando (que quiero borrar) y me deja las demas.
+      pokemonesCargados = pokemonesCargados.filter(card => card.id !== filterId);
+      // Renderizamos, guardamos el ls y verificamos el mensaje ese
+      renderizaArray(pokemonesCargados);
+      localStorage.setItem(`pokemonesCargados`, JSON.stringify(pokemonesCargados));
+    }
+    checkeaMensaje(pokemonesCargados);
+  };
+
+container.addEventListener("click", removePokemon);
+//////
+
+/////
+const checkeaMensaje = (array) =>{
+    if(array.length){
+        console.log("Hay algo en el array");
+        mensaje.classList.add("hidden");
+        return;
+    }else{
+        console.log("No hay nada en el array");
+        mensaje.classList.remove("hidden");
+    }
+}
+//////
+
+const init = () =>{
+    renderizaArray(pokemonesCargados);
+    checkeaMensaje(pokemonesCargados);
+}
+
+init();
+
+
 
 /*
 ¡Claro! Aquí están los cambios que hice en el código con explicaciones sencillas:
