@@ -54,7 +54,7 @@ const renderiza = (pokemon, id) => {
     const capitalizedPokemonName = capitalizeFirstLetter(pokemon.name);
 
     return `
-    <div id="card">
+    <div id="card" class="${pokemon.types[0].type.name}">
         <div>
             <h3>${capitalizedPokemonName}</h3>
             <p>Tipo: ${pokemon.types[0].type.name}</p>

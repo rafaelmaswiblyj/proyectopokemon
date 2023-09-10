@@ -37,7 +37,6 @@ body{
 #card{
     width: 300px;
     height: 200px;
-    background-color: rgb(168, 106, 226);
     border-radius: 20px;
     border: 3px solid;
     padding: 10px;
@@ -50,6 +49,7 @@ body{
 #card>div{
     padding-top: 20px;
     padding-left: 10px;
+    font-size: 0.99rem;
 }
 
 .hidden{
